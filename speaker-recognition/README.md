@@ -1,3 +1,5 @@
+# Code originally from https://github.com/SeanNaren/deepspeech.pytorch
+
 NEED TO BE UPDATE...
 
 $ cd ~

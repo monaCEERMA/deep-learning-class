@@ -1,1 +1,1 @@
-This code is originnaly from: https://github.com/znxlwm/pytorch-generative-model-collections.git
+# Code originnally from: https://github.com/znxlwm/pytorch-generative-model-collections
