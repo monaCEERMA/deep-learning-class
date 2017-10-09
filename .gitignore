@@ -99,3 +99,15 @@ ENV/
 
 # mypy
 .mypy_cache/
+
+
+########
+
+.idea/
+
+neural-machine-translation/data/
+
+deep-speaker/models/
+deep-speaker/data/*.csv
+deep-speaker/data/*_dataset/
+deep-speaker/logs/
