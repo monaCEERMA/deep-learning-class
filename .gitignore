@@ -101,13 +101,20 @@ ENV/
 .mypy_cache/
 
 
+
 ########
 
 .idea/
 
 neural-machine-translation/data/
 
-deep-speaker/models/
-deep-speaker/data/*.csv
-deep-speaker/data/*_dataset/
-deep-speaker/logs/
+speaker-recognition/models/
+speaker-recognition/data/*.csv
+speaker-recognition/data/*_dataset/
+speaker-recognition/logs/
+
+convolutional-neural-networks/data
+convolutional-neural-networks/checkpoint
+
+generative-adversarial-networks/models
+generative-adversarial-networks/results
