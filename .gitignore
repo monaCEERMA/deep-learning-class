@@ -104,6 +104,9 @@ ENV/
 
 ########
 
+*.pth
+*.zip*
+
 .idea/
 
 neural-machine-translation/data/
@@ -116,5 +119,15 @@ speaker-recognition/logs/
 convolutional-neural-networks/data
 convolutional-neural-networks/checkpoint
 
+generative-adversarial-networks/logs
+generative-adversarial-networks/data
 generative-adversarial-networks/models
 generative-adversarial-networks/results
+
+autoencoders/data/
+autoencoders/dc_img/
+autoencoders/mlp_img/
+autoencoders/vae_img/
+
+dcgan/data/
+dcgan/*.png

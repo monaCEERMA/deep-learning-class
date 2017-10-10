@@ -1,3 +1,5 @@
+from __future__ import print_function
+
 # insert this to the top of your scripts (usually main.py)
 import sys, warnings, traceback, torch
 def warn_with_traceback(message, category, filename, lineno, file=None, line=None):
@@ -7,7 +9,6 @@ warnings.showwarning = warn_with_traceback; warnings.simplefilter('always', User
 torch.utils.backcompat.broadcast_warning.enabled = True
 torch.utils.backcompat.keepdim_warning.enabled = True
 
-from __future__ import print_function
 import argparse
 import torch
 import torch.nn as nn
