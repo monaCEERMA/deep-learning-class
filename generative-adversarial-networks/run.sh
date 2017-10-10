@@ -1,1 +1,1 @@
-python main.py --dataset mnist --gan_type GAN
+python main.py --gan_type GAN
