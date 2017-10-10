@@ -1,6 +1,8 @@
 # Speaker Recognition
 
-A code to perform speaker recognition based on the deepspeech.pytorch repository
+A code to perform speaker recognition based on the deepspeech.pytorch repository.
+
+
 
 [![Stories in Ready](https://badge.waffle.io/SeanNaren/deepspeech.pytorch.png?label=ready&title=Ready)](http://waffle.io/SeanNaren/deepspeech.pytorch)
 # deepspeech.pytorch
