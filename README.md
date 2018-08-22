@@ -1,4 +1,3 @@
 # Deep Learning Class
 
-This code is used in deep learning practical lectures.
-
+This code is used in deep learning practical lectures in CIn/UFPE, Brazil.

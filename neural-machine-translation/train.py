@@ -129,6 +129,7 @@ use_cuda = torch.cuda.is_available()
 SOS_token = 0
 EOS_token = 1
 
+
 class Lang:
     def __init__(self, name):
         self.name = name
@@ -158,6 +159,8 @@ class Lang:
 
 # Turn a Unicode string to plain ASCII, thanks to
 # http://stackoverflow.com/a/518232/2809427
+
+
 def unicodeToAscii(s):
     return ''.join(
         c for c in unicodedata.normalize('NFD', s)
@@ -165,6 +168,7 @@ def unicodeToAscii(s):
     )
 
 # Lowercase, trim, and remove non-letter characters
+
 
 def normalizeString(s):
     s = unicodeToAscii(s.lower().strip())
@@ -178,6 +182,7 @@ def normalizeString(s):
 # want to translate from Other Language â†’ English I added the ``reverse``
 # flag to reverse the pairs.
 #
+
 
 def readLangs(lang1, lang2, reverse=False):
     print("Reading lines...")
@@ -210,6 +215,7 @@ def readLangs(lang1, lang2, reverse=False):
 # earlier).
 #
 
+
 MAX_LENGTH = 10
 
 eng_prefixes = (
@@ -221,10 +227,12 @@ eng_prefixes = (
     "they are", "they re "
 )
 
+
 def filterPair(p):
     return len(p[0].split(' ')) < MAX_LENGTH and \
         len(p[1].split(' ')) < MAX_LENGTH and \
         p[1].startswith(eng_prefixes)
+
 
 def filterPairs(pairs):
     return [pair for pair in pairs if filterPair(pair)]
@@ -236,6 +244,7 @@ def filterPairs(pairs):
 # -  Normalize text, filter by length and content
 # -  Make word lists from sentences in pairs
 #
+
 
 def prepareData(lang1, lang2, reverse=False):
     input_lang, output_lang, pairs = readLangs(lang1, lang2, reverse)
@@ -305,6 +314,7 @@ print(random.choice(pairs))
 #
 #
 
+
 class EncoderRNN(nn.Module):
     def __init__(self, input_size, hidden_size, n_layers=1):
         super(EncoderRNN, self).__init__()
@@ -355,6 +365,7 @@ class EncoderRNN(nn.Module):
 #
 #
 
+
 class DecoderRNN(nn.Module):
     def __init__(self, hidden_size, output_size, n_layers=1):
         super(DecoderRNN, self).__init__()
@@ -364,7 +375,8 @@ class DecoderRNN(nn.Module):
         self.embedding = nn.Embedding(output_size, hidden_size)
         self.gru = nn.GRU(hidden_size, hidden_size)
         self.out = nn.Linear(hidden_size, output_size)
-        self.softmax = nn.LogSoftmax()
+        #self.softmax = nn.LogSoftmax()
+        self.softmax = nn.LogSoftmax(dim=1)
 
     def forward(self, input, hidden):
         output = self.embedding(input).view(1, 1, -1)
@@ -418,6 +430,7 @@ class DecoderRNN(nn.Module):
 #
 #
 
+
 class AttnDecoderRNN(nn.Module):
     def __init__(self, hidden_size, output_size, n_layers=1, dropout_p=0.1, max_length=MAX_LENGTH):
         super(AttnDecoderRNN, self).__init__()
@@ -438,8 +451,8 @@ class AttnDecoderRNN(nn.Module):
         embedded = self.embedding(input).view(1, 1, -1)
         embedded = self.dropout(embedded)
 
-        attn_weights = F.softmax(
-            self.attn(torch.cat((embedded[0], hidden[0]), 1)))
+        #attn_weights = F.softmax(self.attn(torch.cat((embedded[0], hidden[0]), 1)))
+        attn_weights = F.softmax(self.attn(torch.cat((embedded[0], hidden[0]), 1)), dim=1)
         attn_applied = torch.bmm(attn_weights.unsqueeze(0),
                                  encoder_outputs.unsqueeze(0))
 
@@ -450,7 +463,8 @@ class AttnDecoderRNN(nn.Module):
             output = F.relu(output)
             output, hidden = self.gru(output, hidden)
 
-        output = F.log_softmax(self.out(output[0]))
+        #output = F.log_softmax(self.out(output[0]))
+        output = F.log_softmax(self.out(output[0]), dim=1)
         return output, hidden, attn_weights
 
     def initHidden(self):
@@ -478,8 +492,10 @@ class AttnDecoderRNN(nn.Module):
 # EOS token to both sequences.
 #
 
+
 def indexesFromSentence(lang, sentence):
     return [lang.word2index[word] for word in sentence.split(' ')]
+
 
 def variableFromSentence(lang, sentence):
     indexes = indexesFromSentence(lang, sentence)
@@ -489,6 +505,7 @@ def variableFromSentence(lang, sentence):
         return result.cuda()
     else:
         return result
+
 
 def variablesFromPair(pair):
     input_variable = variableFromSentence(input_lang, pair[0])
@@ -522,7 +539,9 @@ def variablesFromPair(pair):
 # ``teacher_forcing_ratio`` up to use more of it.
 #
 
+
 teacher_forcing_ratio = 0.5
+
 
 def train(input_variable, target_variable, encoder, decoder, encoder_optimizer, decoder_optimizer, criterion, max_length=MAX_LENGTH):
     encoder_hidden = encoder.initHidden()
@@ -578,20 +597,24 @@ def train(input_variable, target_variable, encoder, decoder, encoder_optimizer, 
     encoder_optimizer.step()
     decoder_optimizer.step()
 
-    return loss.data[0] / target_length
+    #return loss.data[0] / target_length
+    return loss.item() / target_length
 
 ######################################################################
 # This is a helper function to print time elapsed and estimated time
 # remaining given the current time and progress %.
 #
 
+
 import time
 import math
+
 
 def asMinutes(s):
     m = math.floor(s / 60)
     s -= m * 60
     return '%dm %ds' % (m, s)
+
 
 def timeSince(since, percent):
     now = time.time()
@@ -611,6 +634,7 @@ def timeSince(since, percent):
 # Then we call ``train`` many times and occasionally print the progress (%
 # of examples, time so far, estimated time) and average loss.
 #
+
 
 def trainIters(encoder, decoder, n_iters, print_every=1000, plot_every=100, learning_rate=0.01):
     start = time.time()
@@ -654,9 +678,11 @@ def trainIters(encoder, decoder, n_iters, print_every=1000, plot_every=100, lear
 # ``plot_losses`` saved while training.
 #
 
+
 import matplotlib.pyplot as plt
 import matplotlib.ticker as ticker
 import numpy as np
+
 
 def showPlot(points):
     #plt.figure()
@@ -676,6 +702,7 @@ def showPlot(points):
 # predicts the EOS token we stop there. We also store the decoder's
 # attention outputs for display later.
 #
+
 
 def evaluate(encoder, decoder, sentence, max_length=MAX_LENGTH):
     input_variable = variableFromSentence(input_lang, sentence)
@@ -720,6 +747,7 @@ def evaluate(encoder, decoder, sentence, max_length=MAX_LENGTH):
 # input, target, and output to make some subjective quality judgements:
 #
 
+
 def evaluateRandomly(encoder, decoder, n=10):
     for i in range(n):
         pair = random.choice(pairs)
@@ -748,6 +776,7 @@ def evaluateRandomly(encoder, decoder, n=10):
 #    evaluate, and continue training later. Comment out the lines where the
 #    encoder and decoder are initialized and run ``trainIters`` again.
 #
+
 
 hidden_size = 256
 encoder1 = EncoderRNN(input_lang.n_words, hidden_size)
@@ -790,6 +819,7 @@ plt.matshow(attentions.numpy())
 # and labels:
 #
 
+
 #def showAttention(input_sentence, output_words, attentions):
 def showAttention(input_sentence, output_words, attentions):
     # Set up figure with colorbar
@@ -809,6 +839,7 @@ def showAttention(input_sentence, output_words, attentions):
 
     plt.show()
 
+
 def evaluateAndShowAttention(input_sentence):
     output_words, attentions = evaluate(
         encoder1, attn_decoder1, input_sentence)
@@ -816,6 +847,7 @@ def evaluateAndShowAttention(input_sentence):
     print('output =', ' '.join(output_words))
     #showAttention(input_sentence, output_words, attentions)
     showAttention(input_sentence, output_words, attentions)
+
 
 #evaluateAndShowAttention("elle a cinq ans de moins que moi .")
 evaluateAndShowAttention("eu vou trabalhar de bicicleta .")
