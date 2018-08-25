@@ -116,6 +116,8 @@ speaker-recognition/data/*.csv
 speaker-recognition/data/*_dataset/
 speaker-recognition/logs/
 
+mnist/data
+
 convolutional-neural-networks/data
 convolutional-neural-networks/checkpoint
 
