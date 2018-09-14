@@ -62,6 +62,7 @@ net = ResNet18()
 # net = ShuffleNetG2()
 # net = SENet18()
 net = net.to(device)
+print(net)
 if device == 'cuda':
     net = torch.nn.DataParallel(net)
     cudnn.benchmark = True
